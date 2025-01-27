@@ -1,0 +1,15 @@
+[package]
+name = "cuda_setup"
+version = "0.1.0"
+edition = "2021"
+authors = ["David O'Connor <the_alchemist@fastmail.com>"]
+description = "Assists with CUDA setup when using the CUDARC lib."
+keywords = ["cuda", "cudarc", "gpu"]
+categories = ["hardware-support", "api-bindings"]
+repository = "https://github.com/David-OConnor/cuda_setup"
+documentation = "https://docs.rs/cuda_setup"
+readme = "README.md"
+license = "MIT"
+exclude = [".gitignore"]
+
+[dependencies]
