@@ -4,7 +4,9 @@
 //! `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\bin\Hostx64\x64`
 //!
 
+// use cudarc::driver::CudaDevice;
 use std::process::Command;
+// use std::sync::Arc;
 
 #[derive(Copy, Clone)]
 pub enum GpuArchitecture {
@@ -28,6 +30,19 @@ impl GpuArchitecture {
     }
 }
 
+// #[derive(Debug, Clone)]
+// /// For use in your application, if switching between CPU and GPU.
+// pub enum ComputationDevice {
+//     Cpu,
+//     Gpu(Arc<CudaDevice>),
+// }
+//
+// impl Default for ComputationDevice {
+//     fn default() -> Self {
+//         Self::Cpu
+//     }
+// }
+
 /// Call this in `build.rs` to compile the kernal.
 ///
 /// See [These CUDA docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html)
@@ -36,6 +51,10 @@ impl GpuArchitecture {
 /// Compiles our CUDA program using Nvidia's NVCC compiler
 /// Call this in the `main()` fn of `build.rs`.
 pub fn build(architecture: GpuArchitecture, kernels: &[&str]) {
+    if kernels.len() < 1 {
+        return
+    }
+
     // Tell Cargo that if the given file changes, to rerun this build script.
     for kernel in kernels {
         println!("cargo:rerun-if-changed={kernel}");
@@ -43,7 +62,7 @@ pub fn build(architecture: GpuArchitecture, kernels: &[&str]) {
 
     let compilation_result = Command::new("nvcc")
         .args([
-            "src/cuda/cuda.cu",
+            kernels[0],
             "-gencode",
             &architecture.gencode_val(),
             "-ptx",
