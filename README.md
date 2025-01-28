@@ -15,6 +15,8 @@ use cuda_setup::{build, GpuArchitecture};
 
 fn main() {
     // The second parameter is a list of paths to all kernels to compile.
+    // The first kernel passed must be the top-level one. All others are just to watch for changes to trigger
+    // a new compilation.
     build(GpuArchitecture::Rtx4, &vec!["src/cuda/cuda.cu", "src/cuda/util.cu"]);
 }
 ```
@@ -28,11 +30,8 @@ use cuda_setup::{build, GpuArchitecture};
 
 fn main() {
     #[cfg(feature = "cuda")]
-    // The first kernel passed must be the top-level one. All others are just to watch for changes to trigger
-    // a new compilation.
     build(GpuArchitecture::Rtx4, &vec!["src/cuda/cuda.cu", "src/cuda/util.cu"]);
 }
-
 ```
 
 
