@@ -30,18 +30,14 @@ impl GpuArchitecture {
     }
 }
 
-// #[derive(Debug, Clone)]
+// #[derive(Debug, Clone, Default)]
 // /// For use in your application, if switching between CPU and GPU.
 // pub enum ComputationDevice {
+//     #[default]
 //     Cpu,
 //     Gpu(Arc<CudaDevice>),
 // }
-//
-// impl Default for ComputationDevice {
-//     fn default() -> Self {
-//         Self::Cpu
-//     }
-// }
+
 
 /// Call this in `build.rs` to compile the kernal.
 ///
@@ -49,20 +45,22 @@ impl GpuArchitecture {
 /// for info about these flags.
 ///
 /// Compiles our CUDA program using Nvidia's NVCC compiler
-/// Call this in the `main()` fn of `build.rs`.
-pub fn build(architecture: GpuArchitecture, kernels: &[&str]) {
-    if kernels.len() < 1 {
+/// Call this in the `main()` fn of `build.rs`. `cuda_files`'s first parameter
+/// must be the entry point. The other parameters are just so the build step
+/// knows when to re-compile.
+pub fn build(architecture: GpuArchitecture, cuda_filers: &[&str]) {
+    if cuda_filers.len() < 1 {
         return
     }
 
     // Tell Cargo that if the given file changes, to rerun this build script.
-    for kernel in kernels {
+    for kernel in cuda_filers {
         println!("cargo:rerun-if-changed={kernel}");
     }
 
     let compilation_result = Command::new("nvcc")
         .args([
-            kernels[0],
+            cuda_filers[0],
             "-gencode",
             &architecture.gencode_val(),
             "-ptx",
