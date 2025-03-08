@@ -38,7 +38,6 @@ impl GpuArchitecture {
 //     Gpu(Arc<CudaDevice>),
 // }
 
-
 /// Call this in `build.rs` to compile the kernal.
 ///
 /// See [These CUDA docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html)
@@ -50,7 +49,7 @@ impl GpuArchitecture {
 /// knows when to re-compile.
 pub fn build(architecture: GpuArchitecture, cuda_filers: &[&str]) {
     if cuda_filers.len() < 1 {
-        return
+        return;
     }
 
     // Tell Cargo that if the given file changes, to rerun this build script.
@@ -70,6 +69,11 @@ pub fn build(architecture: GpuArchitecture, cuda_filers: &[&str]) {
         .expect("Problem compiling the CUDA module.");
 
     if !compilation_result.status.success() {
-        panic!("CUDA compilation problem: {:?}", compilation_result);
+        panic!(
+            "CUDA compilation problem:\nstatus: {}\nstdout: {}\nstderr: {}",
+            compilation_result.status,
+            String::from_utf8_lossy(&compilation_result.stdout),
+            String::from_utf8_lossy(&compilation_result.stderr)
+        );
     }
 }

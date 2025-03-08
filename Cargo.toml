@@ -1,6 +1,6 @@
 [package]
 name = "cuda_setup"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["David O'Connor <the_alchemist@fastmail.com>"]
 description = "Assists with CUDA setup when using the CUDARC lib."
