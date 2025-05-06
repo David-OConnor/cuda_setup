@@ -1,6 +1,6 @@
 [package]
 name = "cuda_setup"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["David O'Connor <the_alchemist@fastmail.com>"]
 description = "Assists with CUDA setup when using the CUDARC lib."
@@ -12,5 +12,12 @@ readme = "README.md"
 license = "MIT"
 exclude = [".gitignore"]
 
-#[dependencies]
-#cudarc = "^0.13.3"
+[dependencies]
+cudarc = "^0.16.3"
+
+[features]
+
+cuda-12050 = ["cudarc/cuda-12050"]
+cuda-12060 = ["cudarc/cuda-12060"]
+cuda-12080 = ["cudarc/cuda-12080"]
+cuda-12090 = ["cudarc/cuda-12090"]

@@ -38,9 +38,13 @@ fn main() {
 Include this in `Cargo.toml`:
 ```toml
 [dependencies]
-cudarc = { version = "^0.13.3",features=["cuda-12060"] }
+cudarc = { version = "^0.13.3", features=["cuda-12060"] }
+
+# For runtime conveniences.
+cuda_setup = { version = "^0.1.2", features = ["cuda-12060"] }
 
 
 [build-dependencies]
-cuda_setup = "^0.1.0"
+# For compiling kernels to PTX.
+cuda_setup = { version = "^0.1.2", features = ["cuda-12060"] }
 ```
