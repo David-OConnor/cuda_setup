@@ -4,11 +4,10 @@
 //! `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\bin\Hostx64\x64`
 //!
 
-use cudarc::{
-    driver::{CudaContext, CudaModule, CudaStream},
-};
+// use cudarc::{
+//     driver::{CudaContext, CudaModule, CudaStream},
+// };
 use std::process::Command;
-use std::sync::Arc;
 // use std::sync::Arc;
 
 #[derive(Copy, Clone)]
@@ -33,12 +32,12 @@ impl GpuArchitecture {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub enum ComputationDevice {
-    #[default]
-    Cpu,
-    Gpu((Arc<CudaStream>, Arc<CudaModule>)),
-}
+// #[derive(Debug, Clone, Default)]
+// pub enum ComputationDevice {
+//     #[default]
+//     Cpu,
+//     Gpu((Arc<CudaStream>, Arc<CudaModule>)),
+// }
 
 /// Call this in `build.rs` to compile the kernal.
 ///
