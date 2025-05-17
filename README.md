@@ -41,5 +41,5 @@ Include this in `Cargo.toml`:
 ```toml
 [build-dependencies]
 # For compiling kernels to PTX.
-cuda_setup = { version = "^0.1.4" }
+cuda_setup = "0.1.4"
 ```
