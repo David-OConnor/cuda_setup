@@ -81,8 +81,6 @@ pub fn build(architecture: GpuArchitecture, cuda_files: &[&str]) {
                 );
             }
         }
-        Err(e) => eprintln!("Unable to compile CUDA files: {e}")
+        Err(e) => eprintln!("Unable to compile CUDA files: {e}"),
     }
-
-
 }
