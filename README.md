@@ -5,8 +5,11 @@
 
 
 This library abstracts over some of the boilerplate needed to use the [Cudarc library](https://github.com/coreylowman/cudarc), for using 
-CUDA GPU compute in the rust language. Primarily, it allows compiling of CUDA files (e.g. kernels and supporting code)
-to PTX during application build.
+CUDA GPU compute in the rust language. Primarily, it compiles of CUDA files (e.g. kernels and supporting code)
+to PTX during application build, using the `nvcc` compiler that comes with CUDA.
+
+Note: you must have CUDA installed, and set the environment var `LD_LIBARARY_PATH` to your CUDA bin directory,
+e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\bin`
 
 To use, create a `build.rs` file like this:
 
