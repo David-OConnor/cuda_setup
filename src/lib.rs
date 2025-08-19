@@ -73,7 +73,8 @@ pub fn build(architecture: GpuArchitecture, cuda_files: &[&str]) {
             if output.status.success() {
                 println!("Compiled the following CUDA files: {cuda_files:?}");
             } else {
-                eprintln!(
+                // eprintln!(
+                panic!(
                     "CUDA compilation problem:\nstatus: {}\nstdout: {}\nstderr: {}",
                     output.status,
                     String::from_utf8_lossy(&output.stdout),
