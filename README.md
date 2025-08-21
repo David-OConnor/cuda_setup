@@ -12,7 +12,8 @@ Note: You must set the environment var `LD_LIBARARY_PATH` (Linux) or `PATH` (Win
 directory, e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\bin`. You may also need the build tools
 containing `cl.exe` or similar in the path, e.g.: `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64`
 
-To use, create a `build.rs` file like this:
+To use, create a `build.rs` file like this. It will automatically compile a PTX file. You should 
+package this PTX with your program, either as a file, or included in the binary.
 
 ```rust
 //! We use this to automatically compile CUDA C++ code when building.
@@ -20,10 +21,12 @@ To use, create a `build.rs` file like this:
 use cuda_setup::{build, GpuArchitecture};
 
 fn main() {
-    // The second parameter is a list of paths to all kernels to compile.
+    // -This first parameter is the minimum GPU architecture that will be compatible.
+    // -The second parameter is a list of paths to all kernels to compile.
     // The first kernel passed must be the entry point. All others are just to watch for changes to trigger
     // a new compilation.
-    build(GpuArchitecture::Rtx4, &vec!["src/cuda/cuda.cu", "src/cuda/util.cu"]);
+    // -The third parameter is the name of the PTX file to output.
+    build(GpuArchitecture::Rtx4, &vec!["src/cuda/cuda.cu", "src/cuda/util.cu"], "my_program");
 }
 ```
 
