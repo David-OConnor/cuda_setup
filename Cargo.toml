@@ -13,6 +13,7 @@ license = "MIT"
 exclude = [".gitignore"]
 
 [dependencies]
+cc = "1.0.0"
 #cudarc = "0.17.1"
 
 [features]

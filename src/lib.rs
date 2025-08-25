@@ -7,7 +7,7 @@
 //! You may also need the build tools
 //! containing `cl.exe` or similar in the path, e.g.: `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64`
 
-use std::process::Command;
+use std::{env, process::Command};
 // use std::sync::Arc;
 
 // use cudarc::{
@@ -38,6 +38,11 @@ impl GpuArchitecture {
         let v = (*self) as u8;
         format!("-arch=compute_{v}")
     }
+
+    pub fn sm_val(&self) -> String {
+        let v = (*self) as u8;
+        format!("-arch=sm_{v}")
+    }
 }
 
 // #[derive(Debug, Clone, Default)]
@@ -58,7 +63,7 @@ impl GpuArchitecture {
 /// knows when to re-compile.
 ///
 /// The architecture provided is the minimum supported one the PTX will output.
-pub fn build(min_arch: GpuArchitecture, cuda_files: &[&str], ptx_filename: &str) {
+pub fn build_ptx(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str) {
     if cuda_files.len() < 1 {
         return;
     }
@@ -77,24 +82,67 @@ pub fn build(min_arch: GpuArchitecture, cuda_files: &[&str], ptx_filename: &str)
             "-ptx",
             "-O3", // optimized/release mode.
             "-o",
-            &format!("{ptx_filename}.ptx"),
+            &format!("{filename}.ptx"),
         ])
         .output();
 
     match compilation_result {
         Ok(output) => {
             if output.status.success() {
-                println!("Compiled the following CUDA files: {cuda_files:?}");
+                println!("Compiled the following PTX files: {cuda_files:?}");
             } else {
                 // eprintln!(
                 panic!(
-                    "CUDA compilation problem:\nstatus: {}\nstdout: {}\nstderr: {}",
+                    "CUDA PTX compilation problem:\nstatus: {}\nstdout: {}\nstderr: {}",
                     output.status,
                     String::from_utf8_lossy(&output.stdout),
                     String::from_utf8_lossy(&output.stderr)
                 );
             }
         }
-        Err(e) => eprintln!("Unable to compile CUDA files: {e}"),
+        Err(e) => eprintln!("Unable to compile PTX: {e}"),
+    }
+}
+
+// todo WIP
+/// Build host-side CUDA files (not kernels0. This is useful, for example, for using cuFFT.
+pub fn build_host(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str) {
+    // Tell Cargo that if the given file changes, to rerun this build script.
+    for kernel in cuda_files {
+        println!("cargo:rerun-if-changed={kernel}");
+    }
+
+    let cuda_path = env::var("CUDA_PATH").unwrap_or_else(|_| "/usr/local/cuda".into());
+
+    let mut build = cc::Build::new();
+    build.cuda(true).file(cuda_files[0]).flag("-O3");
+    // .flag("-std=c++14");
+
+    build.flag(&min_arch.sm_val());
+
+    if cfg!(target_os = "linux") {
+        build.flag("-Xcompiler=-fPIC");
+    }
+
+    build.compile(filename);
+
+    // Link against CUDA libs (search path differs by platform)
+    #[cfg(target_os = "windows")]
+    {
+        println!("cargo:rustc-link-search=native={}\\lib\\x64", cuda_path);
+        println!("cargo:rustc-link-lib=cufft");
+        // todo Hmmm. I am trying to avoid cudart. do i need it?
+        // println!("cargo:rustc-link-lib=cudart");
+        // if you used cublas for scaling:
+        // println!("cargo:rustc-link-lib=cublas");
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        println!("cargo:rustc-link-search=native={}/lib64", cuda_path);
+        println!("cargo:rustc-link-lib=cufft");
+        // todo Hmmm. I am trying to avoid cudart. do i need it?
+        // println!("cargo:rustc-link-lib=cudart");
+        // println!("cargo:rustc-link-lib=cublas");
     }
 }
