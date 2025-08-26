@@ -115,8 +115,11 @@ pub fn build_host(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str
     let cuda_path = env::var("CUDA_PATH").unwrap_or_else(|_| "/usr/local/cuda".into());
 
     let mut build = cc::Build::new();
-    build.cuda(true).file(cuda_files[0]).flag("-O3");
-    // .flag("-std=c++14");
+    build
+        .cuda(true)
+        .file(cuda_files[0])
+        .flag("-O3")
+        .flag("-std=c++14"); // todo: A/R
 
     build.flag(&min_arch.sm_val());
 
@@ -131,9 +134,8 @@ pub fn build_host(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str
     {
         println!("cargo:rustc-link-search=native={}\\lib\\x64", cuda_path);
         println!("cargo:rustc-link-lib=cufft");
-        // todo Hmmm. I am trying to avoid cudart. do i need it?
+
         // println!("cargo:rustc-link-lib=cudart");
-        // if you used cublas for scaling:
         // println!("cargo:rustc-link-lib=cublas");
     }
 
@@ -141,7 +143,7 @@ pub fn build_host(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str
     {
         println!("cargo:rustc-link-search=native={}/lib64", cuda_path);
         println!("cargo:rustc-link-lib=cufft");
-        // todo Hmmm. I am trying to avoid cudart. do i need it?
+
         // println!("cargo:rustc-link-lib=cudart");
         // println!("cargo:rustc-link-lib=cublas");
     }
