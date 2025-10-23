@@ -8,11 +8,6 @@
 //! containing `cl.exe` or similar in the path, e.g.: `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64`
 
 use std::{env, process::Command};
-// use std::sync::Arc;
-
-// use cudarc::{
-//     driver::{CudaContext, CudaModule, CudaStream},
-// };
 
 #[derive(Copy, Clone)]
 #[repr(u8)]
@@ -31,7 +26,7 @@ impl GpuArchitecture {
     /// [Selecting architecture, by nVidia series](https://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/)
     pub fn gencode_val(&self) -> String {
         let v = (*self) as u8;
-        String::from(format!("arch=compute_{v},code=sm_{v}"))
+        format!("arch=compute_{v},code=sm_{v}")
     }
 
     pub fn compute_val(&self) -> String {
@@ -45,13 +40,6 @@ impl GpuArchitecture {
     }
 }
 
-// #[derive(Debug, Clone, Default)]
-// pub enum ComputationDevice {
-//     #[default]
-//     Cpu,
-//     Gpu((Arc<CudaStream>, Arc<CudaModule>)),
-// }
-
 /// Call this in `build.rs` to compile the kernal.
 ///
 /// See [These CUDA docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html)
@@ -64,7 +52,7 @@ impl GpuArchitecture {
 ///
 /// The architecture provided is the minimum supported one the PTX will output.
 pub fn build_ptx(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str) {
-    if cuda_files.len() < 1 {
+    if cuda_files.is_empty() {
         return;
     }
 
@@ -104,8 +92,8 @@ pub fn build_ptx(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str)
     }
 }
 
-// todo WIP
-/// Build host-side CUDA files (not kernels0. This is useful, for example, for using cuFFT.
+/// Build host-side CUDA files (not kernels. This is useful, for example, for compiling cuFFT FFI code.
+/// Uses the `cc` lib to compile C or C++ code.
 pub fn build_host(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str) {
     // Tell Cargo that if the given file changes, to rerun this build script.
     for kernel in cuda_files {
@@ -119,9 +107,9 @@ pub fn build_host(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str
         .cuda(true)
         .file(cuda_files[0])
         .flag("-O3")
-        .flag("-std=c++14"); // todo: A/R
+        .flag("-std=c++20");
 
-    build.flag(&min_arch.sm_val());
+    build.flag(min_arch.sm_val());
 
     if cfg!(target_os = "linux") {
         build.flag("-Xcompiler=-fPIC");
