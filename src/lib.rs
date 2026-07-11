@@ -18,8 +18,10 @@ pub enum GpuArchitecture {
     Rtx3 = 86,
     /// "Ada"
     Rtx4 = 89,
-    /// "Blackwell"
-    Rtx5 = 100,
+    /// Jetson AGX Thor / DRIVE Thor ("Blackwell", CC 11.0). Requires CUDA 13+.
+    Thor = 110,
+    /// "Blackwell" (consumer RTX 50-series). Requires CUDA 12.8+.
+    Rtx5 = 120,
 }
 
 impl GpuArchitecture {
@@ -88,7 +90,7 @@ pub fn build_ptx(min_arch: GpuArchitecture, cuda_files: &[&str], filename: &str)
                 );
             }
         }
-        Err(e) => eprintln!("Unable to compile PTX: {e}"),
+        Err(e) => panic!("Unable to run nvcc; is it installed and on PATH? {e}"),
     }
 }
 
